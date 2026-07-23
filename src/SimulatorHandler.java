@@ -67,23 +67,16 @@ public class SimulatorHandler {
     }
 
     void simulateBusStop(Bus bus, BusStop busStop) {
-        int exitedPassengerCount = rand.nextInt(EXITED_PASSENGERS_MIN_COUNT, EXITED_PASSENGERS_MAX_COUNT + 1);
-
         showCurrentBusStopReachedMessage(busStop);
 
-        for (int i = 0; i < exitedPassengerCount; i++) {
-            if (bus.isBusEmpty()) break;
-            List<Passenger> passengers = bus.getPassengers();
-            Passenger passenger = passengers.get(rand.nextInt(passengers.size()));
-            boolean result = bus.removePassenger(passenger);
+        unBoardingFromBus(bus);
+        boardingToBus(bus, busStop);
 
-            if (result) {
-                System.out.println(passenger + " left the bus");
-            } else {
-                System.out.println(passenger + " something went wrong when trying to leave the bus");
-            }
-        }
+        showCurrentBusState(bus);
+        showCurrentBusStopState(busStop);
+    }
 
+    void boardingToBus(Bus bus, BusStop busStop) {
         while (!bus.isBusFull() && !busStop.isBusStopEmpty()) {
             Passenger passenger = busStop.pollNextPassenger();
             boolean result = bus.addPassenger(passenger);
@@ -94,9 +87,43 @@ public class SimulatorHandler {
                 System.out.println(passenger + " something went wrong when trying to enter the bus");
             }
         }
+    }
 
-        showCurrentBusState(bus);
-        showCurrentBusStopState(busStop);
+    void unBoardingFromBus(Bus bus) {
+        int exitedPassengerCount = rand.nextInt(EXITED_PASSENGERS_MIN_COUNT, EXITED_PASSENGERS_MAX_COUNT + 1);
+
+        List<Passenger> candidates = bus.getPassengersCopy();
+
+        List<Passenger> exitingPassengers = new ArrayList<>();
+
+        int actualExitCount =
+                Math.min(exitedPassengerCount, candidates.size());
+
+        for (int i = 0; i < actualExitCount; i++) {
+            int randomIndex = rand.nextInt(candidates.size());
+            Passenger passenger = candidates.remove(randomIndex);
+            exitingPassengers.add(passenger);
+        }
+
+        for (Passenger passenger : exitingPassengers) {
+            if (passenger.isPriority()) {
+                boolean result = bus.removePassenger(passenger);
+
+                if (result) {
+                    System.out.println(passenger + " left the bus");
+                }
+            }
+        }
+
+        for (Passenger passenger : exitingPassengers) {
+            if (!passenger.isPriority()) {
+                boolean result = bus.removePassenger(passenger);
+
+                if (result) {
+                    System.out.println(passenger + " left the bus");
+                }
+            }
+        }
     }
 
     void showCurrentBusStopReachedMessage(BusStop busStop) {

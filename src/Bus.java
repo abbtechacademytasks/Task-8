@@ -26,16 +26,12 @@ public class Bus {
         return passengers.remove(passenger);
     }
 
-    List<Passenger> getPassengers() {
-        return List.copyOf(passengers);
+    List<Passenger> getPassengersCopy() {
+        return new ArrayList<>(passengers);
     }
 
     boolean isBusFull() {
         return passengers.size() >= BUS_CAPACITY;
-    }
-
-    boolean isBusEmpty() {
-        return passengers.isEmpty();
     }
 
     @Override
