@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringJoiner;
@@ -5,8 +6,8 @@ import java.util.StringJoiner;
 public class BusStop {
     private final String name;
     private static final int MAX_BUS_STOP_CAPACITY = 10;
-    private final Queue<Passenger> regularPassengers = new LinkedList<>();
-    private final Queue<Passenger> priorityPassengers = new LinkedList<>();
+    private final Queue<Passenger> regularPassengers = new ArrayDeque<>();
+    private final Queue<Passenger> priorityPassengers = new ArrayDeque<>();
 
     public BusStop(String name) {
         this.name = name;
@@ -50,12 +51,8 @@ public class BusStop {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("[" + name + "] ");
+        StringBuilder stringBuilder = new StringBuilder(name + " ");
         StringJoiner stringJoiner = new StringJoiner(", ", "[", "]");
-
-        if (isBusStopEmpty()) {
-            stringBuilder.append("is empty");
-        }
 
         for (Passenger passenger : priorityPassengers) {
             stringJoiner.add(passenger.toString());
